@@ -25,4 +25,9 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> getProducts(Map<String, String> params, int page) {
         return this.productRepository.getProducts(params, page);
     }
+
+    @Override
+    public int countProuct() {
+        return this.productRepository.countProuct();
+    }
 }
