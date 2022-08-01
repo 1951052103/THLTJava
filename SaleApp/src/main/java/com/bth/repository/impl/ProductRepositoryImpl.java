@@ -78,7 +78,7 @@ public class ProductRepositoryImpl implements ProductRepository {
 
             q.orderBy(b.desc(root.get("id")), b.desc(root.get("name")));
         }
-        
+
         Query query = session.createQuery(q);
 
         if (page > 0) {
@@ -97,5 +97,32 @@ public class ProductRepositoryImpl implements ProductRepository {
         Query q = session.createQuery("SELECT COUNT(*) FROM Product");
 
         return Integer.parseInt(q.getSingleResult().toString());
+    }
+
+    @Override
+    public boolean addProduct(Product p) {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+
+        try {
+            session.save(p);
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean deleteProduct(int id) {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+        
+        try {
+            Product p = session.get(Product.class, id);
+            session.delete(p);
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
     }
 }

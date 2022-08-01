@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProductServiceImpl implements ProductService {
+
     @Autowired
     private ProductRepository productRepository;
 
@@ -29,5 +30,17 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public int countProuct() {
         return this.productRepository.countProuct();
+    }
+
+    @Override
+    public boolean addProduct(Product p) {
+        p.setImage("https://res.cloudinary.com/dxxwcby8l/image/upload/v1647248652/dkeolz3ghc0eino87iec.jpg");
+
+        return this.productRepository.addProduct(p);
+    }
+
+    @Override
+    public boolean deleteProduct(int id) {
+        return this.productRepository.deleteProduct(id);
     }
 }
