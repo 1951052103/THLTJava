@@ -52,7 +52,7 @@ CREATE TABLE `order_detail` (
   `order_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
   `unit_price` decimal(10,0) DEFAULT '0',
-  `num` varchar(45) COLLATE utf8_unicode_ci DEFAULT '0',
+  `num` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK_ORDERDETAIL_ORDER_idx` (`order_id`),
   KEY `FK_ORDERDETAIL_PRODUCT_idx` (`product_id`),

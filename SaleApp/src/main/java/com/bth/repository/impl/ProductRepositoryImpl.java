@@ -6,6 +6,9 @@ package com.bth.repository.impl;
 
 import java.util.List;
 import com.bth.pojo.Product;
+import com.bth.pojo.Category;
+import com.bth.pojo.OrderDetail;
+import com.bth.pojo.SaleOrder;
 import com.bth.repository.ProductRepository;
 import java.util.ArrayList;
 import java.util.Map;
@@ -124,5 +127,45 @@ public class ProductRepositoryImpl implements ProductRepository {
             ex.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public List<Object[]> cateStats() {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        
+        Root rP = q.from(Product.class);
+        Root rC = q.from(Category.class);
+        q.where(b.equal(rP.get("categoryId"), rC.get("id")));
+        
+        q.multiselect(rC.get("id"), rC.get("name"), b.count(rP.get("id")));
+        q.groupBy(rC.get("id"));
+        
+        Query query = session.createQuery(q);
+        return query.getResultList();
+    }
+    
+    @Override
+    public List<Object[]> revenueStats() {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        
+        Root rP = q.from(Product.class);
+        Root rD = q.from(OrderDetail.class);
+        Root rO = q.from(SaleOrder.class);
+        
+        q.multiselect(rP.get("id"), rP.get("name"), b.sum(b.prod(rD.get("unitPrice"), rD.get("num"))));
+        
+        Predicate p = b.equal(b.function("QUARTER", Integer.class, rO.get("createdDate")), 4);
+        
+        q.where(b.equal(rP.get("id"), rD.get("productId")), 
+                b.equal(rD.get("orderId"), rO.get("id")), p);
+        
+        q.groupBy(rP.get("id"));
+        
+        Query query = session.createQuery(q);
+        return query.getResultList();
     }
 }

@@ -17,4 +17,6 @@ public interface ProductRepository {
     int countProuct();
     boolean addProduct(Product p);
     boolean deleteProduct(int id);
+    List<Object[]> cateStats();
+    List<Object[]> revenueStats();
 }
