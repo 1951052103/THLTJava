@@ -4,6 +4,7 @@
  */
 package com.bth.service;
 
+import com.bth.pojo.Comments;
 import com.bth.pojo.Product;
 import java.util.List;
 import java.util.Map;
@@ -19,4 +20,7 @@ public interface ProductService {
     boolean deleteProduct(int id);
     List<Object[]> cateStats();
     List<Object[]> revenueStats();
+    List<Comments> getComments();
+    Product getProductById(int id);
+    Comments addComment(String content, int productId);
 }

@@ -4,6 +4,7 @@
  */
 package com.bth.service.impl;
 
+import com.bth.pojo.Comments;
 import com.bth.pojo.Product;
 import com.bth.repository.ProductRepository;
 import com.bth.service.ProductService;
@@ -52,5 +53,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Object[]> revenueStats() {
         return this.productRepository.revenueStats();
+    }
+
+    @Override
+    public List<Comments> getComments() {
+        return this.productRepository.getComments();
+    }
+
+    @Override
+    public Product getProductById(int id) {
+        return this.productRepository.getProductById(id);
+    }
+
+    @Override
+    public Comments addComment(String content, int productId) {
+        return this.productRepository.addComment(content, productId);
     }
 }

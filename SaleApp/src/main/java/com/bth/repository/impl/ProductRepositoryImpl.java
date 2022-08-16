@@ -7,8 +7,10 @@ package com.bth.repository.impl;
 import java.util.List;
 import com.bth.pojo.Product;
 import com.bth.pojo.Category;
+import com.bth.pojo.Comments;
 import com.bth.pojo.OrderDetail;
 import com.bth.pojo.SaleOrder;
+import com.bth.pojo.User;
 import com.bth.repository.ProductRepository;
 import java.util.ArrayList;
 import java.util.Map;
@@ -167,5 +169,34 @@ public class ProductRepositoryImpl implements ProductRepository {
         
         Query query = session.createQuery(q);
         return query.getResultList();
+    }
+
+    @Override
+    public List<Comments> getComments() {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+        Query q = session.createQuery("FROM Comments");
+
+        return q.getResultList();
+    }
+
+    @Override
+    public Product getProductById(int id) {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+        return session.get(Product.class, id);
+    }
+    
+    @Override
+    public Comments addComment(String content, int productId) {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+        
+        Comments c = new Comments();
+        c.setContent(content);
+        c.setProductId(this.getProductById(productId));
+        c.setUserId(session.get(User.class, 6));
+        
+        
+        session.save(c);
+        
+        return c;
     }
 }

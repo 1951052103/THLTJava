@@ -7,6 +7,7 @@
     <class>com.bth.pojo.User</class>
     <class>com.bth.pojo.OrderDetail</class>
     <class>com.bth.pojo.SaleOrder</class>
+    <class>com.bth.pojo.Comments</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/saledb?zeroDateTimeBehavior=CONVERT_TO_NULL"/>
