@@ -56,8 +56,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Comments> getComments() {
-        return this.productRepository.getComments();
+    public List<Comments> getComments(int productId) {
+        return this.productRepository.getComments(productId);
     }
 
     @Override

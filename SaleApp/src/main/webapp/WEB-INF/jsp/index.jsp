@@ -28,7 +28,7 @@
                         <fmt:setLocale value = "en_US"/>
                         <fmt:formatNumber value = "${p.price}" type = "currency"/>
                     </p>
-                    <a href="#" class="btn btn-primary">Xem chi tiet</a>
+                    <a href="/SaleApp/products/${p.id}" class="btn btn-primary">Xem chi tiet</a>
                 </div>
             </div>
         </div>

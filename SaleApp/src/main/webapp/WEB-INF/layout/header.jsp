@@ -5,6 +5,7 @@
 --%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <div class="container-fluid">
@@ -27,6 +28,32 @@
                     </li>
                 </c:forEach>
 
+                <sec:authorize access="!isAuthenticated()">
+                    <li class="nav-item">
+                        <a class="nav-link text-success" href="<c:url value="/login" />">Dang Nhao</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-success" href="<c:url value="/register" />">Dang Ky</a>
+                    </li>
+                </sec:authorize>
+                <sec:authorize access="isAuthenticated()">
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="<c:url value="/" />">
+                            ${pageContext.session.getAttribute("currentUser").firstName}
+                            <sec:authentication property="principal.username"/>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-danger" href="<c:url value="/logout" />">Dang xuat</a>
+                    </li>
+                </sec:authorize>
+                    
+                <sec:authorize access="hasRole('ROLE_ADMIN')">
+                    <li class="nav-item">
+                        <a class="nav-link text-info" href="<c:url value="/admin/products" />">Quan ly</a>
+                    </li>
+                </sec:authorize>    
             </ul>
 
             <c:url value="/" var="action" />

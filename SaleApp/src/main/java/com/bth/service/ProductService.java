@@ -20,7 +20,7 @@ public interface ProductService {
     boolean deleteProduct(int id);
     List<Object[]> cateStats();
     List<Object[]> revenueStats();
-    List<Comments> getComments();
+    List<Comments> getComments(int productId);
     Product getProductById(int id);
     Comments addComment(String content, int productId);
 }

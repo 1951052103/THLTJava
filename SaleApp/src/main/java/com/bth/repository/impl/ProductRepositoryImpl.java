@@ -12,6 +12,7 @@ import com.bth.pojo.OrderDetail;
 import com.bth.pojo.SaleOrder;
 import com.bth.pojo.User;
 import com.bth.repository.ProductRepository;
+import com.bth.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.Map;
 import javax.persistence.criteria.Predicate;
@@ -24,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +43,8 @@ public class ProductRepositoryImpl implements ProductRepository {
     private LocalSessionFactoryBean sessionFactory;
     @Autowired
     private Environment env;
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<Product> getProducts(Map<String, String> params, int page) {
@@ -120,7 +125,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public boolean deleteProduct(int id) {
         Session session = this.sessionFactory.getObject().getCurrentSession();
-        
+
         try {
             Product p = session.get(Product.class, id);
             session.delete(p);
@@ -136,45 +141,46 @@ public class ProductRepositoryImpl implements ProductRepository {
         Session session = this.sessionFactory.getObject().getCurrentSession();
         CriteriaBuilder b = session.getCriteriaBuilder();
         CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
-        
+
         Root rP = q.from(Product.class);
         Root rC = q.from(Category.class);
         q.where(b.equal(rP.get("categoryId"), rC.get("id")));
-        
+
         q.multiselect(rC.get("id"), rC.get("name"), b.count(rP.get("id")));
         q.groupBy(rC.get("id"));
-        
-        Query query = session.createQuery(q);
-        return query.getResultList();
-    }
-    
-    @Override
-    public List<Object[]> revenueStats() {
-        Session session = this.sessionFactory.getObject().getCurrentSession();
-        CriteriaBuilder b = session.getCriteriaBuilder();
-        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
-        
-        Root rP = q.from(Product.class);
-        Root rD = q.from(OrderDetail.class);
-        Root rO = q.from(SaleOrder.class);
-        
-        q.multiselect(rP.get("id"), rP.get("name"), b.sum(b.prod(rD.get("unitPrice"), rD.get("num"))));
-        
-        Predicate p = b.equal(b.function("QUARTER", Integer.class, rO.get("createdDate")), 4);
-        
-        q.where(b.equal(rP.get("id"), rD.get("productId")), 
-                b.equal(rD.get("orderId"), rO.get("id")), p);
-        
-        q.groupBy(rP.get("id"));
-        
+
         Query query = session.createQuery(q);
         return query.getResultList();
     }
 
     @Override
-    public List<Comments> getComments() {
+    public List<Object[]> revenueStats() {
         Session session = this.sessionFactory.getObject().getCurrentSession();
-        Query q = session.createQuery("FROM Comments");
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+
+        Root rP = q.from(Product.class);
+        Root rD = q.from(OrderDetail.class);
+        Root rO = q.from(SaleOrder.class);
+
+        q.multiselect(rP.get("id"), rP.get("name"), b.sum(b.prod(rD.get("unitPrice"), rD.get("num"))));
+
+        Predicate p = b.equal(b.function("QUARTER", Integer.class, rO.get("createdDate")), 4);
+
+        q.where(b.equal(rP.get("id"), rD.get("productId")),
+                b.equal(rD.get("orderId"), rO.get("id")), p);
+
+        q.groupBy(rP.get("id"));
+
+        Query query = session.createQuery(q);
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Comments> getComments(int productId) {
+        Session session = this.sessionFactory.getObject().getCurrentSession();
+        Query q = session.createQuery("FROM Comments WHERE productId.id=:productId");
+        q.setParameter("productId", productId);
 
         return q.getResultList();
     }
@@ -184,19 +190,21 @@ public class ProductRepositoryImpl implements ProductRepository {
         Session session = this.sessionFactory.getObject().getCurrentSession();
         return session.get(Product.class, id);
     }
-    
+
     @Override
     public Comments addComment(String content, int productId) {
         Session session = this.sessionFactory.getObject().getCurrentSession();
-        
+
         Comments c = new Comments();
         c.setContent(content);
         c.setProductId(this.getProductById(productId));
-        c.setUserId(session.get(User.class, 6));
-        
-        
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentPrincipalName = authentication.getName();
+        c.setUserId( this.userRepository.getUserByUsername(currentPrincipalName) );
+
         session.save(c);
-        
+
         return c;
     }
 }
